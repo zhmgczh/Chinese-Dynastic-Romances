@@ -18,10 +18,10 @@ def main(
             output.write(
                 '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<title>'
                 + book_name
-                + "</title>\n</head>\n<body>\n<h1>"
+                + '</title>\n</head>\n<body>\n<h1 style="text-align:center;">'
                 + book_name
                 + "</h1>\n"
-                + "<p>"
+                + '<p style="text-align:center;">'
                 + author_name
                 + "</p>\n"
             )
@@ -37,7 +37,11 @@ def main(
                     file_splitter.write(line + "\n")
                     catalog_count += 1
                 elif block_first and "" != line:
-                    output.write(f'<h2 id="section_{block_count}">' + line + "</h2>\n")
+                    output.write(
+                        f'<h2 style="page-break-before: always;text-align:center;" id="section_{block_count}">'
+                        + line
+                        + "</h2>\n"
+                    )
                     file_splitter = open(
                         f"{book_name}（校對）/《{book_name}》{line}.txt",
                         mode="w",
