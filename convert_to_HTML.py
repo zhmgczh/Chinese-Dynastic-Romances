@@ -16,7 +16,7 @@ def main(
         ) as output:
             file_splitter = None
             output.write(
-                '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<title>'
+                '<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<html xmlns="http://www.w3.org/1999/xhtml" lang="zh" xml:lang="zh">\n<head>\n<title>'
                 + book_name
                 + '</title>\n</head>\n<body>\n<h1 style="text-align:center;">'
                 + book_name
