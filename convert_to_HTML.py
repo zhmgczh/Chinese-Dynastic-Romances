@@ -1,0 +1,106 @@
+replace_dictionary = {
+    ":": "：",
+    "﹔": "；",
+    ",": "，",
+    "!": "！",
+    "?": "？",
+    "(": "（",
+    ")": "）",
+    "⋯⋯": "……",
+    " ": "　",
+    "——":"──"
+}
+recurrent_replace_dictionary = {" \n": "\n", "　\n": "\n", "\t\n": "\n", "\r\n": "\n"}
+
+
+def in_at_least_one_of(text: str) -> bool:
+    for replecement in recurrent_replace_dictionary:
+        if replecement in text:
+            return True
+    return False
+
+
+def process_text(text: str) -> str:
+    for replecemenet in replace_dictionary:
+        text = text.replace(replecemenet, replace_dictionary[replecemenet])
+    while in_at_least_one_of(text):
+        for replecemenet in recurrent_replace_dictionary:
+            text = text.replace(
+                replecemenet, recurrent_replace_dictionary[replecemenet]
+            )
+    return text
+
+
+def main(
+    book_name: str = "秦漢演義",
+    author_name: str = "中華民國．蔡東藩",
+    catalog_tag: str = "目錄",
+) -> None:
+    original_text = open(
+        f"{book_name}（校對）/{book_name}.txt", mode="r", encoding="utf-8"
+    ).read()
+    processed_text = process_text(original_text)
+    with open(
+        f"{book_name}（校對）/{book_name}.txt", mode="w", encoding="utf-8"
+    ) as output:
+        output.write(processed_text)
+    with open(
+        f"{book_name}（校對）/{book_name}.txt", mode="r", encoding="utf-8"
+    ) as input:
+        lines = input.readlines()
+        block_count = 0
+        block_first = True
+        catalog = False
+        catalog_count = 0
+        with open(
+            f"{book_name}（校對）/{book_name}.html", mode="w", encoding="utf-8"
+        ) as output:
+            file_splitter = None
+            output.write(
+                '<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<html xmlns="http://www.w3.org/1999/xhtml" lang="zh" xml:lang="zh">\n<head>\n<title>'
+                + book_name
+                + '</title>\n</head>\n<body>\n<h1 style="text-align:center;">'
+                + book_name
+                + "</h1>\n"
+                + '<p style="text-align:center;">'
+                + author_name
+                + "</p>\n"
+            )
+            for line in lines:
+                if "\n" == line[-1]:
+                    line = line[:-1]
+                if catalog and line not in ("", "　　※※※"):
+                    output.write(
+                        f'<p><a href="#section_{catalog_count+1}">'
+                        + line
+                        + "</a></p>\n"
+                    )
+                    file_splitter.write(line + "\n")
+                    catalog_count += 1
+                elif block_first and "" != line:
+                    output.write(
+                        f'<h2 style="page-break-before: always;text-align:center;" id="section_{block_count}">'
+                        + line
+                        + "</h2>\n"
+                    )
+                    file_splitter = open(
+                        f"{book_name}（校對）/《{book_name}》{line}.txt",
+                        mode="w",
+                        encoding="utf-8",
+                    )
+                    block_first = False
+                elif "" != line:
+                    output.write("<p>" + line + "</p>\n")
+                    file_splitter.write(line + "\n")
+                if catalog_tag == line:
+                    catalog = True
+                elif "　　※※※" == line:
+                    file_splitter.close()
+                    catalog = False
+                    block_count += 1
+                    block_first = True
+            output.write("</body>\n</html>")
+
+
+if "__main__" == __name__:
+    main()
