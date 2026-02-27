@@ -1,0 +1,4 @@
+[core]
+    filemode = false
+    fsmonitor = true
+    untrackedCache = true
